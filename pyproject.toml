@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "ocr-tools"
+version = "0.1.0"
+description = ""
+authors = ["cwulfman <cwulfman@princeton.edu>"]
+readme = "README.md"
+packages = [{include = "ocr", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pytesseract = "^0.3.10"
+pillow = "^9.4.0"
+pandas = "^1.5.3"
+requests = "^2.28.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pyright = "^1.1.298"
+pytest = "^7.2.2"
+black = "^23.1.0"
+flake8 = "^6.0.0"
+pytest-datafiles = "^3.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
