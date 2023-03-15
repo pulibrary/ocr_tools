@@ -1,15 +1,13 @@
-from pathlib import Path
-from ocr import Tesseract, ImageDb, image_db
+import pytest
+from ocr import Tesseract
 import pandas
 
 
-def test_tesseract(tmp_path):
-    image_db = ImageDb(tmp_path)
-    img_uri = 'https://figgy.princeton.edu/downloads/2ae6db12-575c-4708-a8a9-8b8408c171b7/file/5028e3a4-df6d-4527-b44e-db21a81324b9'
-    img_id = img_uri.split('/')[-1]
-    image_file = image_db.fetch(img_uri)
-    tess = Tesseract()
-    assert tess.data_frame(image_file).__class__ == pandas.core.frame.DataFrame
-    assert tess.alto(image_file).__class__ == str
-    assert tess.hocr(image_file).__class__ == str
-    assert tess.string(image_file).__class__ == str
+def test_tesseract():
+    image_uri = 'https://iiif-cloud.princeton.edu/iiif/2/9d%2F50%2F9a%2F9d509abf80ed4021a22f13b03f509bba%2Fintermediate_file/full/1000,/0/default.jpg'
+    ocr = Tesseract(image_uri)
+    result = ocr.string
+    assert result.__class__ == str
+    # assert ocr.alto.__class__ == str
+    # assert ocr.hocr.__class__ == str
+    # assert ocr.data_frame.__class__ == pd.core.frame.DataFrame

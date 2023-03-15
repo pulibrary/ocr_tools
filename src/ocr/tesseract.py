@@ -1,33 +1,48 @@
-from ctypes import pydll
-from os import strerror
+from io import BytesIO
+import requests
 import pytesseract
-from pathlib import Path
 import pandas as pd
+from PIL import Image
 
 
 class Tesseract(object):
-    def __init__(self, lang='eng') -> None:
+    def __init__(self, uri: str, lang="eng") -> None:
         if lang in pytesseract.get_languages():
             self.lang = lang
         else:
             raise ValueError(f'lang {lang} not found')
 
-    def data_frame(self, image_path: Path) -> pd.core.frame.DataFrame:
+        self.uri = uri
+        self._image = None
+
+    @property
+    def image(self):
+        if self._image is None:
+            response = requests.get(self.uri)
+            self._image = BytesIO(response.content)
+        return self._image
+
+    @property
+    def data_frame(self) -> pd.core.frame.DataFrame:
         ocr_data = pytesseract.image_to_data(
-            str(image_path), lang=self.lang, output_type='data.frame'
+            Image.open(self.image), lang=self.lang, output_type='data.frame'
         )
         return ocr_data
 
-    def alto(self, image_path: Path) -> str:
-        ocr_data = pytesseract.image_to_alto_xml(str(image_path), lang=self.lang)
+    @property
+    def alto(self) -> str:
+        ocr_data = pytesseract.image_to_alto_xml(Image.open(self.image), lang=self.lang)
+
         return ocr_data.decode('UTF-8')
 
-    def hocr(self, image_path: Path) -> str:
+    @property
+    def hocr(self) -> str:
         ocr_data = pytesseract.image_to_pdf_or_hocr(
-            str(image_path), lang=self.lang, extension='hocr'
+            Image.open(self.image), lang=self.lang, extension='hocr'
         )
         return ocr_data.decode('UTF-8')
 
-    def string(self, image_path: Path) -> str:
-        ocr_data = pytesseract.image_to_string(str(image_path), lang=self.lang)
+    @property
+    def string(self) -> str:
+        ocr_data = pytesseract.image_to_string(Image.open(self.image), lang=self.lang)
         return ocr_data
